@@ -5,7 +5,7 @@
 
 # init workspace env add cocos2d-js framework into dir
 - cocos new -l js tetris-html5-temp
-- cp -rf tetris-html5-temp/frameworks tetris-html5/
+- cp -r tetris-html5-temp/frameworks tetris-html5/
 - rm -rf tetris-html5-temp
 
 # debug
