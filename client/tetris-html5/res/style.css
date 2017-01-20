@@ -1,0 +1,23 @@
+.header {
+    background-color: grey;
+    height: 50px;
+    width: 100%;
+}
+.header span {
+    font-size: 30px;
+}
+.header a {
+    float: right;
+}
+.body-left {
+    float: left;
+    padding: 50px 20px 20px 120px;
+}
+.body-right {
+    float: right;
+    padding: 40px 250px 20px 20px;
+}
+#Cocos2dGameContainer {
+    width:100%!important;
+    height:100%!important
+}
