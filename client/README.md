@@ -9,6 +9,6 @@
 - rm -rf tetris-html5-temp
 
 # debug
-cd tetris-html5 & sh run.sh
+cd tetris-html5 & cocos run -p web
 
 # publish
