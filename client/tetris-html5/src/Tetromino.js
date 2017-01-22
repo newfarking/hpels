@@ -10,7 +10,6 @@ var Tetromino = cc.Class.extend({
 
         this._type = type;
         var shapes = TetrominoType.shape[type];
-        console.log("type:" + type);
 
         this._unit1=new Unit(shapes[0][0],shapes[0][1],type);
         this._unit2=new Unit(shapes[1][0],shapes[1][1],type);

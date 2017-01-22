@@ -24,9 +24,11 @@ var GameLayer = cc.Layer.extend({
         this.addChild(bgDraw, 1);
         var left = (size.width - Constant.BOARD_WIDTH * Constant.BOX_SIZE) / 2;
         var bottom = (size.height - Constant.BOARD_HEIGHT * Constant.BOX_SIZE) / 2;
+        cc.log(left);
+        cc.log(bottom);
 
-        bgDraw.drawRect(cc.p(left, bottom), cc.p(left + Constant.BOARD_WIDTH * Constant.BOX_SIZE,
-            bottom + Constant.BOARD_HEIGHT * Constant.BOX_SIZE), cc.color(58, 58, 58, 255), 1, null);
+        bgDraw.drawRect(cc.p(left, bottom), cc.p(left + Constant.BOARD_WIDTH * Constant.BOX_SIZE + 1,
+            bottom + Constant.BOARD_HEIGHT * Constant.BOX_SIZE + 1), cc.color(58, 58, 58, 255), 1, null);
 
         this._grid = new Grid(Constant.BOARD_WIDTH, Constant.BOARD_HEIGHT);
         this._moManager = new MotionManager(this._grid);
@@ -45,6 +47,7 @@ var GameLayer = cc.Layer.extend({
         this.ui = new GameUI(this);
         this.addChild(this.ui, 3);
         this.ui.showToGameLayer();
+        
 
         this.init();
         return true;
@@ -75,8 +78,17 @@ var GameLayer = cc.Layer.extend({
             cc.eventManager.addListener({
                 event: cc.EventListener.MOUSE,
                 onMouseUp: function(event) {
-                    if (!me._gameStarted) {
-                        me.start();
+                    var target = event.getCurrentTarget();
+                    var locationInNode = target.convertToNodeSpace(event.getLocation())
+                    var rect = cc.rect(0, 0, cc.winSize.width, cc.winSize.height);
+                    cc.log(rect);
+                    cc.log(locationInNode);
+                    if (cc.rectContainsPoint(rect, locationInNode)) {
+                        if (!me._gameStarted) {
+                            me.start();
+                        }
+                    } else {
+                        return true;
                     }
                 }
             }, this);
@@ -231,7 +243,7 @@ var GameLayer = cc.Layer.extend({
     },
 
     startGravity: function () {
-        this.schedule(this.fallPiece, 0.5);
+        this.schedule(this.fallPiece, 0.8);
     },
 
     stopGravity: function () {

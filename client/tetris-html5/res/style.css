@@ -1,10 +1,22 @@
 .header {
-    background-color: grey;
     height: 50px;
     width: 100%;
 }
+.header div {
+    margin-top: 20px;
+    line-height:30px;
+}
 .header span {
     font-size: 30px;
+    text-shadow: 3px 5px 5px #fff;
+}
+.header .logo {
+    float:left;
+    margin-left:100px;
+}
+.header .login {
+    float:right;
+    margin-right:40px
 }
 .header a {
     float: right;
@@ -18,6 +30,16 @@
     padding: 40px 250px 20px 20px;
 }
 #Cocos2dGameContainer {
-    width:100%!important;
-    height:100%!important
+    box-shadow: 3px 4px 5px #333;
+}
+body {
+    background: #ffe4c4;
+}
+@font-face {
+font-family: mylisu;
+src:url('res/lisu.ttf'); 
+}
+.logo a {
+    text-decoration:none;
+    margin: 5px 0px 0px 5px;
 }

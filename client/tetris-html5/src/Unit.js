@@ -17,21 +17,21 @@ var Unit = cc.Class.extend({
     setX: function (x) {
         this._x = x;
         if (this._display) {
-            this._display.x = this._x * Constant.BOX_SIZE + Constant.BOX_SIZE / 2;
+            this._display.x = this._x * Constant.BOX_SIZE + Constant.BOX_SIZE / 2 + 1;
         }
     },
 
     setY: function (y) {
         this._y = y;
         if (this._display) {
-            this._display.y = (Constant.BOARD_HEIGHT - this._y - 1) * Constant.BOX_SIZE + Constant.BOX_SIZE / 2;
+            this._display.y = (Constant.BOARD_HEIGHT - this._y - 1) * Constant.BOX_SIZE + Constant.BOX_SIZE / 2 + 1;
         }
     },
 
     toDisplay: function() {
         this._display = this._display ? this._display : new Box(this._type);
-        this._display.x = (this._x) * Constant.BOX_SIZE + Constant.BOX_SIZE / 2;
-        this._display.y = (Constant.BOARD_HEIGHT - this._y - 1) * Constant.BOX_SIZE + Constant.BOX_SIZE / 2;
+        this._display.x = (this._x) * Constant.BOX_SIZE + Constant.BOX_SIZE / 2 + 1;
+        this._display.y = (Constant.BOARD_HEIGHT - this._y - 1) * Constant.BOX_SIZE + Constant.BOX_SIZE / 2 + 1;
         return this._display;
     },
 

@@ -99,7 +99,8 @@ var GameUI = cc.Layer.extend({
         this.successUsedTimeField.x = size.width / 2;
         this.successUsedTimeField.y = size.height * 2 / 3;
 
-        var toGameLabel = new cc.LabelTTF("点击开始游戏", "arial", 12);
+        var toGameLabel = new cc.LabelTTF("点击开始游戏");
+        toGameLabel.setFontSize(16);
         this.successGameLayer.addChild(toGameLabel);
         toGameLabel.x = size.width / 2;
         toGameLabel.y = size.height / 2;
@@ -116,23 +117,15 @@ var GameUI = cc.Layer.extend({
             Constant.BOARD_WIDTH * Constant.BOX_SIZE, Constant.BOARD_HEIGHT * Constant.BOX_SIZE);
 
 
-        this.toGameLayer.addChild(toGameLabel);
-        this.toGameLayer.addChild(rankLabel);
-        this.toGameLayer.addChild(shareLabel);
-        this.toGameLayer.addChild(followLabel);
+//        this.toGameLayer.addChild(toGameLabel);
+//        this.toGameLayer.addChild(rankLabel);
+//        this.toGameLayer.addChild(shareLabel);
+//        this.toGameLayer.addChild(followLabel);
 
-
-        var total = 4;
         var interval = 12;
 
         toGameLabel.x = size.width / 2;
-        toGameLabel.y = size.height / 2 + interval * 2;
-        rankLabel.x = size.width / 2;
-        rankLabel.y = size.height / 2;
-        shareLabel.x = size.width / 2;
-        shareLabel.y = size.height / 2 + 12;
-        followLabel.x = size.width / 2;
-        followLabel.y = size.height / 2 - 12;
+        toGameLabel.y = size.height / 2;
     },
     _initGameingPanel: function () {
 
@@ -153,7 +146,7 @@ var GameUI = cc.Layer.extend({
         this.useTimeControl = new cc.LabelTTF("0", "arial", 20);
         this.useTimeControl.x = 0;
         this.useTimeControl.y = 0;
-        this.useTimeControl.setColor(cc.color(58, 58, 58, 255));
+        this.useTimeControl.setColor(cc.color(255, 215, 00, 255));
         useTimeBg.addChild(this.useTimeControl);
 
 
