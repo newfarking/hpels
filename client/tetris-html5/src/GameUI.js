@@ -44,7 +44,7 @@ var GameUI = cc.Layer.extend({
         if (this.gameLayer._success != null) {
             if (this.gameLayer._success === true) {
                 this._initSuccessGamePanel();
-                this.successUsedTimeField.setString("耗时" + this.gameLayer.useTime + "秒,顺利!");
+                this.successUsedTimeField.setString(this.gameLayer.useTime + "s");
                 this.addChild(this.successGameLayer, 12);
             } else {
                 this._initFailGamePanel();
@@ -78,32 +78,52 @@ var GameUI = cc.Layer.extend({
         this.failGameLayer = new cc.LayerColor(cc.color(255, 255, 255, 10),
             Constant.BOARD_WIDTH * Constant.BOX_SIZE, Constant.BOARD_HEIGHT * Constant.BOX_SIZE);
 
-        this.failGameLayer.addChild(this.failLabel);
+        // this.failGameLayer.addChild(this.failLabel);
         this.failLabel.x = size.width / 2;
         this.failLabel.y = size.height * 2 / 3;
 
         var toGameLabel = new cc.LabelTTF("点击开始游戏", "arial", 12);
-        this.failGameLayer.addChild(toGameLabel);
+        // this.failGameLayer.addChild(toGameLabel);
         toGameLabel.x = size.width / 2;
         toGameLabel.y = size.height / 2;
+        
+        var replayBtn = new ccui.Button();
+        replayBtn.loadTextures("res/play.png", "", "")
+        this.failGameLayer.addChild(replayBtn);
+        replayBtn.x = size.width / 2;
+        replayBtn.y = size.height / 2;
+
+        var failBtn = new ccui.Button();
+        failBtn.loadTextures("res/cry.png", "", "")
+        this.failGameLayer.addChild(failBtn);
+        failBtn.x = size.width / 2;
+        failBtn.y = size.height * 3 / 4;
+        failBtn.setScale(0.8);
     },
 
     _initSuccessGamePanel: function () {
         var size = cc.director.getWinSize();
-        this.successUsedTimeField = new cc.LabelTTF("耗时XX秒", "arial", 16);
+        this.successUsedTimeField = new cc.LabelTTF("30s", "arial", 64);
 
         this.successGameLayer = new cc.LayerColor(cc.color(255, 255, 255, 10),
             Constant.BOARD_WIDTH * Constant.BOX_SIZE, Constant.BOARD_HEIGHT * Constant.BOX_SIZE);
 
         this.successGameLayer.addChild(this.successUsedTimeField);
         this.successUsedTimeField.x = size.width / 2;
-        this.successUsedTimeField.y = size.height * 2 / 3;
+        this.successUsedTimeField.y = size.height * 3 / 4;
 
         var toGameLabel = new cc.LabelTTF("点击开始游戏");
         toGameLabel.setFontSize(16);
-        this.successGameLayer.addChild(toGameLabel);
+//        this.successGameLayer.addChild(toGameLabel);
         toGameLabel.x = size.width / 2;
         toGameLabel.y = size.height / 2;
+
+
+        var replayBtn = new ccui.Button();
+        replayBtn.loadTextures("res/play.png", "", "")
+        this.successGameLayer.addChild(replayBtn);
+        replayBtn.x = size.width / 2;
+        replayBtn.y = size.height / 2;
     },
     _initToGamePanel: function () {
         var size = cc.director.getWinSize();
@@ -126,6 +146,12 @@ var GameUI = cc.Layer.extend({
 
         toGameLabel.x = size.width / 2;
         toGameLabel.y = size.height / 2;
+        var startBtn = new ccui.Button();
+        startBtn.loadTextures("res/play.png", "", "")
+        startBtn.setTitleText("");
+        this.toGameLayer.addChild(startBtn);
+        startBtn.x = size.width / 2;
+        startBtn.y = size.height / 2;
     },
     _initGameingPanel: function () {
 
