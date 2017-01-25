@@ -50,7 +50,12 @@ var GameLayer = cc.Layer.extend({
         
 
         this.init();
+        this.scheduleUpdate(); 
         return true;
+    },
+
+    update:function(dt){  
+          
     },
 
     init: function () {
@@ -268,11 +273,35 @@ var GameLayer = cc.Layer.extend({
         this._success = null;
     },
 
+    getCookie: function (c_name) {
+        if (document.cookie.length>0) {
+            c_start=document.cookie.indexOf(c_name + "=");
+            if (c_start!=-1) {
+                c_start=c_start + c_name.length+1;
+                c_end=document.cookie.indexOf(";",c_start);
+                if (c_end==-1) {
+                    c_end=document.cookie.length;
+                }
+                return unescape(document.cookie.substring(c_start,c_end));
+            }
+        }
+        return "";
+    },
+ 
     stop: function () {
         this._gameStarted = false;
         this.unschedule(this.calTime);
         this.stopGravity();
         this.ui.showToGameLayer();
+        if (this._success == true) {
+            var xhr = cc.loader.getXMLHttpRequest();
+            xhr.open("POST", "/upload");
+            xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
+            var coo = this.getCookie("hpels-0908");
+            var time = coo + "|" + this.useTime + "|" + hex_md5(coo + this.useTime + "19920908");
+            var params = {"time": time, records: ""}
+            xhr.send(JSON.stringify(params));
+        }
     },
 
     fallPiece: function () {

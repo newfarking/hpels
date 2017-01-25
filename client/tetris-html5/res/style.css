@@ -1,10 +1,6 @@
 .header {
     height: 50px;
-    width: 100%;
-}
-.header div {
-    margin-top: 20px;
-    line-height:30px;
+    padding: 20px 40px 10px 120px;
 }
 .header span {
     font-size: 30px;
@@ -12,22 +8,21 @@
 }
 .header .logo {
     float:left;
-    margin-left:100px;
 }
 .header .login {
     float:right;
-    margin-right:40px
 }
 .header a {
     float: right;
 }
+.content {
+    padding: 10px 200px 20px 120px;
+}
 .body-left {
     float: left;
-    padding: 50px 20px 20px 120px;
 }
 .body-right {
     float: right;
-    padding: 40px 250px 20px 20px;
 }
 #Cocos2dGameContainer {
     box-shadow: 3px 4px 5px #333;
