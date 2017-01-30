@@ -429,15 +429,6 @@ var GameLayer = cc.Layer.extend({
     },
  
     stop: function () {
-        if (this._replay) {
-            this._replay = false;
-            this.scheduleOnce(function() {
-                this.waitForReplay();
-            }, 1);
-        } else {
-            this.ui.showToGameLayer();
-            this.stopGravity();
-        }
         
         this._gameStarted = false;
         this.unschedule(this.calTime);
@@ -451,6 +442,15 @@ var GameLayer = cc.Layer.extend({
             var time = coo + "|" + this.useTime + "|" + hex_md5(coo + this.useTime + "19920908");
             var params = {"time": time, records: JSON.stringify(this._record)};
             xhr.send(JSON.stringify(params));
+        }
+        if (this._replay) {
+            this._replay = false;
+            this.scheduleOnce(function() {
+                this.waitForReplay();
+            }, 1);
+        } else {
+            this.ui.showToGameLayer();
+            this.stopGravity();
         }
     },
 
