@@ -22,6 +22,7 @@
         "src/MotionManager.js",
         "src/GameUI.js",
         "src/SmallBox.js",
-        "src/md5.js"
+        "src/md5.js",
+        "src/Record.js"
     ]
 }

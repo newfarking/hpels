@@ -25,27 +25,19 @@ public class RankService {
     @Autowired
     RankDao rankDao;
 
-    public List<Rank> getRanks(Boolean reward) throws IOException {
+    public List<Rank> getRanks() throws IOException {
 
         Map<String, Rank> rankMap = new HashMap<>();
 
         for (Rank rank : rankDao.listRanks(10000)) {
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            Record record = objectMapper.readValue(rank.records, Record.class);
-
-            if (reward && (record._rewardOpen == null || record._rewardOpen)
-                    || !reward && (record._rewardOpen != null && record._rewardOpen == false)) {
-
-                Rank r = rankMap.get(rank.userId);
-                if (r != null) {
-                    if (r.useTime > rank.useTime
-                            || (r.useTime == rank.useTime && r.createTime.compareTo(rank.createTime) > 0)) {
-                        rankMap.put(rank.userId, rank);
-                    }
-                } else {
+            Rank r = rankMap.get(rank.userId);
+            if (r != null) {
+                if (r.useTime > rank.useTime
+                        || (r.useTime == rank.useTime && r.createTime.compareTo(rank.createTime) > 0)) {
                     rankMap.put(rank.userId, rank);
                 }
+            } else {
+                rankMap.put(rank.userId, rank);
             }
         }
 

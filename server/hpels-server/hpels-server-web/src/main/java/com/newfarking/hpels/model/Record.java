@@ -7,10 +7,5 @@ import java.util.List;
  */
 public class Record {
     public List<String> _tetrisRecords;
-    public List<Motion> _motionRecords;
-    public Boolean _rewardOpen;
-    public static class Motion {
-        public int _frameIndex;
-        public String _motion;
-    }
+    public List<Integer> _motionRecords;
 }

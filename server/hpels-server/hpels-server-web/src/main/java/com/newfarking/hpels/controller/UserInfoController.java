@@ -8,16 +8,14 @@ import com.newfarking.hpels.access.LoginInterceptor;
 import com.newfarking.hpels.model.Rank;
 import com.newfarking.hpels.model.RankForFE;
 import com.newfarking.hpels.model.Record;
+import com.newfarking.hpels.model.fe.UploadRequest;
 import com.newfarking.hpels.service.RankService;
 import com.newfarking.hpels.service.UserService;
 import com.newfarking.hpels.utils.SecureHelper;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -37,8 +35,19 @@ public class UserInfoController {
     @Autowired
     RankService rankService;
 
+    @RequestMapping(value = "/getbestrank", method = RequestMethod.GET)
+    public EdpResultResponse<Rank> getRank() throws IOException {
+        return new EdpResultResponse<Rank>().withResult(
+                rankService.getRanks().get(0)
+        );
+    }
+
     @RequestMapping(value = "/getRank/{id}", method = RequestMethod.GET)
-    public EdpResultResponse<Rank> getRank(@PathVariable String id) {
+    public EdpResultResponse<Rank> getRank(@PathVariable String id) throws IOException {
+        if ("best".equals(id)) {
+            return new EdpResultResponse<Rank>().withResult(
+                    rankService.getRanks().get(0));
+        }
         return new EdpResultResponse<Rank>().withResult(
                 rankService.getRank(id)
         );
@@ -47,7 +56,7 @@ public class UserInfoController {
     @RequestMapping(value = "/getRanks", method = RequestMethod.POST, params = "reward")
     public EdpPageResultResponse<RankForFE> getRanks(@RequestParam int reward) throws IOException {
 
-        Collection<Rank> ranks = rankService.getRanks(reward == 1);
+        Collection<Rank> ranks = rankService.getRanks();
 
         List<RankForFE> ranksForFE = new ArrayList<>();
         for (Rank rank : ranks) {
@@ -60,10 +69,9 @@ public class UserInfoController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public void uploadScore(@RequestParam String time, @RequestParam String records) {
-        rankService.insertRank(new Rank(0, "test", "34",
-               12, null, "2323"));
-        if (!check(time)) {
+    public void uploadScore(@RequestBody UploadRequest request) {
+
+        if (!check(request.time)) {
             return;
         }
 
@@ -71,8 +79,9 @@ public class UserInfoController {
         if (username.length() == 0) {
             username = String.valueOf(UserService.subjectToken.get().getUid());
         }
-        rankService.insertRank(new Rank(0, username, time.split("\\|")[0],
-                Integer.parseInt(time.split("\\|")[2]), null, records));
+        rankService.insertRank(new Rank(0, username, request.time.split("\\|")[0],
+                Integer.parseInt(request.time.split("\\|")[2]), null,
+                request.records));
     }
 
     private static boolean check(String data) {

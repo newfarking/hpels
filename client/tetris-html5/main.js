@@ -52,6 +52,8 @@
  *
  */
 
+var gameScene = null;
+
 cc.game.onStart = function(){
     if(!cc.sys.isNative && document.getElementById("cocosLoading")) //If referenced loading.js, please remove it
         document.body.removeChild(document.getElementById("cocosLoading"));
@@ -70,7 +72,8 @@ cc.game.onStart = function(){
     cc.view.resizeWithBrowserSize(true);
     //load resources
     cc.LoaderScene.preload(g_resources, function () {
-        cc.director.runScene(new GameScene());
+        gameScene = new GameScene();
+        cc.director.runScene(gameScene);
     }, this);
 };
 cc.game.run();

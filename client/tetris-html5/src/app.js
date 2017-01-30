@@ -4,6 +4,7 @@ var GameLayer = cc.Layer.extend({
     _pieceHolder: null,
     ui: null,
 
+    _debug: false,
     useTime: 0,
 
     _grid: null,
@@ -16,6 +17,14 @@ var GameLayer = cc.Layer.extend({
 
     _success: null,
 
+    _record: null,
+    _replay: null,
+    _frameIndex: 0,
+    _tetrisRecordsIndex: 0,
+    _motionRecordsIndex: 0,
+
+    _keyboardListener: null,
+    _mouseListener: null,
     ctor: function () {
 
         this._super();
@@ -47,25 +56,152 @@ var GameLayer = cc.Layer.extend({
         this.ui = new GameUI(this);
         this.addChild(this.ui, 3);
         this.ui.showToGameLayer();
-        
 
-        this.init();
+        this._init();
         this.scheduleUpdate(); 
         return true;
     },
 
-    update:function(dt){  
-          
+    _currentFrameIndex: -1,
+    _currentAction: -1,
+
+    getCurrentFrameIndex: function() {
+        if (this._currentFrameIndex == -1) {
+            var index = parseInt(this._record._motionRecords[this._motionRecordsIndex] / 100);
+            this._currentAction =  this._record._motionRecords[this._motionRecordsIndex] % 100;
+            this._motionRecordsIndex ++;
+            this._currentFrameIndex = index;
+            return index;
+        } else {
+            return this._currentFrameIndex;
+        }
     },
 
-    init: function () {
-        this.initUserEvent();
+    update:function(dt){  
+        if (this._replay) {
+            while (this._frameIndex == this.getCurrentFrameIndex()) {
+                var action = this._currentAction;
+                var ret = this.doAction(action);
+                if (ret == false && action == 2) {
+                    this._landed();
+                }
+                this._currentFrameIndex = -1;
+            }
+        }
+        this._frameIndex ++;      
+    },
+    
+    doAction: function(action) {
+        var ret = -1;
+        switch (action) {
+            case 0:
+                ret = this._moManager.moveLeft(this._curPiece);
+                break;
+            case 1:
+                ret = this._moManager.moveRight(this._curPiece);
+                break;
+            case 2:
+                ret = this._moManager.moveDown(this._curPiece);
+                break;
+            case 3:
+                ret = this._moManager.rotate(this._curPiece);
+                break;
+        } 
+        if (this._replay) {
+            ; 
+        } else {
+            var motionRecord = this._frameIndex * 100 + action;
+            this._record._motionRecords[this._motionRecordsIndex ++] = motionRecord; 
+        }
+        return ret;
+    },
+    
+    _init: function () {
+        this.initMouseEvent();
         this.initMap(Constant.BAD_LINES);
         this._speedUpDir = null;
-        //this.start();
+
+        // this.startBestReplay();
+        /*
+        var me = this;
+        cc.loader.loadTxt("res/bestrank.txt", function(err, data){
+            var rank = eval('(' + data + ')');
+            me.doReplay(rank, me);
+        });*/
     },
 
-    initUserEvent: function () {
+    onEnter: function () {
+        this._super();
+        this._replayRankId = "best";
+        this.scheduleOnce(function() {
+            this.waitForReplay();
+        }, 1);
+    },
+
+    _replayRankId: null,
+
+    waitForReplay: function() {
+        if (this._debug) { 
+            var me = this;
+            if (!this._gameStarted) {
+                cc.loader.loadTxt("res/bestrank.txt", function(err, data){
+                    var rank = eval('(' + data + ')');
+                    me.doReplay(rank, me, false);
+                });
+            } 
+        } else {
+            this.startReplay(this._replayRankId, this._replayRankId != "best");
+        }
+    },
+
+    doReplay: function(record, me, force) {
+
+        if (!(me._gameStarted && me._replay == false) || force) {
+            me._gameStarted = true;
+            me.start(record);
+        }
+    },
+    startReplay: function(rankId, force) {
+        // get best records 
+        var xhr = cc.loader.getXMLHttpRequest();
+        xhr.open("GET", "/getRank/" + rankId);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        var me = this;
+        this._replayRankId = rankId;
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 207)) {
+                var res = xhr.responseText;
+                var rank = eval('(' + res + ')');
+                me.doReplay(eval("(" + rank.result.records + ")"), me, force);
+            }
+        }
+        xhr.send();
+    },
+
+    initMouseEvent: function() {
+        var me = this;
+        if ("mouse" in cc.sys.capabilities) {
+            cc.eventManager.addListener({
+                event: cc.EventListener.MOUSE,
+                onMouseUp: function(event) {
+                    var target = event.getCurrentTarget();
+                    var locationInNode = target.convertToNodeSpace(event.getLocation())
+                    var rect = cc.rect(0, 0, cc.winSize.width, cc.winSize.height);
+                    cc.log(rect);
+                    cc.log(locationInNode);
+                    if (cc.rectContainsPoint(rect, locationInNode)) {
+                        if (!(me._gameStarted && !me._replay)) {
+                            me.start(null);
+                        }
+                    } else {
+                        return true;
+                    }
+                }
+            }, this);
+        }
+    },
+
+    initKeyboardEvent: function () {
         var me = this;
         if ("keyboard" in cc.sys.capabilities) {
             cc.eventManager.addListener({
@@ -79,26 +215,8 @@ var GameLayer = cc.Layer.extend({
             }, this);
         }
 
-        if ("mouse" in cc.sys.capabilities) {
-            cc.eventManager.addListener({
-                event: cc.EventListener.MOUSE,
-                onMouseUp: function(event) {
-                    var target = event.getCurrentTarget();
-                    var locationInNode = target.convertToNodeSpace(event.getLocation())
-                    var rect = cc.rect(0, 0, cc.winSize.width, cc.winSize.height);
-                    cc.log(rect);
-                    cc.log(locationInNode);
-                    if (cc.rectContainsPoint(rect, locationInNode)) {
-                        if (!me._gameStarted) {
-                            me.start();
-                        }
-                    } else {
-                        return true;
-                    }
-                }
-            }, this);
-        }
 
+        /*
         if ("touches" in cc.sys.capabilities) {
             cc.eventManager.addListener({
                 event: cc.EventListener.TOUCH_ONE_BY_ONE,
@@ -110,7 +228,7 @@ var GameLayer = cc.Layer.extend({
                     me._touchUp(touch, event);
                 }
             }, this);
-        }
+        }*/
     },
 
     _touchDown: function (touch, event) {
@@ -138,7 +256,7 @@ var GameLayer = cc.Layer.extend({
 
         if (opt === "NONE") {
             if (!this._gameStarted) {
-                this.start();
+                this.start(null);
                 return true;
             }
         }
@@ -231,19 +349,22 @@ var GameLayer = cc.Layer.extend({
     },
 
     _moveLeft: function () {
-        this._moManager.moveLeft(this._curPiece);
+        this.doAction(0);
+        // this._moManager.moveLeft(this._curPiece);
     },
 
     _moveRight: function () {
-        this._moManager.moveRight(this._curPiece);
+        this.doAction(1);
+        // this._moManager.moveRight(this._curPiece);
     },
 
     _rotate: function () {
-        this._moManager.rotate(this._curPiece);
+        this.doAction(3);
+        // this._moManager.rotate(this._curPiece);
     },
 
     _landing: function () {
-        while (this._moManager.moveDown(this._curPiece));
+        while (this.doAction(2));
         this._landed();
     },
 
@@ -259,16 +380,35 @@ var GameLayer = cc.Layer.extend({
         this.useTime += 1;
     },
 
-    start: function () {
+    // if record is null run normal else run in replay model.
+    start: function (record) {
+        if (record == null) { // in play model
+            this._record = new Record(); // new for save records
+            this._replay = false;
+            this.initKeyboardEvent();
+        } else {
+            this._record = record;
+            this._replay = true;
+        }
+        this._tetrisRecordsIndex = 0;
+        this._motionRecordsIndex = 0;
+        this._frameIndex = 0;
+        this._currentFrameIndex = -1;
+        
         this.useTime = 0;
-        this.startGravity();
+        if (!this._replay) {
+            this.startGravity();
+        }
         this.schedule(this.calTime, 1);
         this.initMap(Constant.BAD_LINES);
+        this._nextPiece = null;
         this._createPiece();
         this._updateMainHolder();
         this._updatePieceHolder();
 
-        this.ui.hideToGameLayer();
+        if (!this._replay) {
+            this.ui.hideToGameLayer();
+        }
         this._gameStarted = true;
         this._success = null;
     },
@@ -289,24 +429,34 @@ var GameLayer = cc.Layer.extend({
     },
  
     stop: function () {
+        if (this._replay) {
+            this._replay = false;
+            this.scheduleOnce(function() {
+                this.waitForReplay();
+            }, 1);
+        } else {
+            this.ui.showToGameLayer();
+            this.stopGravity();
+        }
+        
         this._gameStarted = false;
         this.unschedule(this.calTime);
-        this.stopGravity();
-        this.ui.showToGameLayer();
-        if (this._success == true) {
+        cc.eventManager.removeListeners(cc.EventListener.KEYBOARD);
+
+        var coo = this.getCookie("hpels-0908");
+        if (this._success == true && coo != "") {
             var xhr = cc.loader.getXMLHttpRequest();
             xhr.open("POST", "/upload");
-            xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
-            var coo = this.getCookie("hpels-0908");
+            xhr.setRequestHeader("Content-Type", "application/json");
             var time = coo + "|" + this.useTime + "|" + hex_md5(coo + this.useTime + "19920908");
-            var params = {"time": time, records: ""}
+            var params = {"time": time, records: JSON.stringify(this._record)};
             xhr.send(JSON.stringify(params));
         }
     },
 
     fallPiece: function () {
         // move down
-        if (!this._moManager.moveDown(this._curPiece)) {
+        if (!this.doAction(2)) {
             this._landed();
         }
     },
@@ -371,18 +521,28 @@ var GameLayer = cc.Layer.extend({
         this._updateMainHolder();
     },
 
+    _getNewType: function() {
+        if (this._replay) {
+            return this._record._tetrisRecords[this._tetrisRecordsIndex ++]; 
+        } else {
+            var type = TetrominoType.random();
+            this._record._tetrisRecords[this._tetrisRecordsIndex ++] = type;
+            return type;
+        }
+    },
+
     _createPiece: function () {
         var type = null;
         if (!this._nextPiece) {
-            type = TetrominoType.random();
+            type = this._getNewType();
             this._nextPiece = new Tetromino(type);
         }
-
         this._curPiece = this._nextPiece;
-
         this._curPiece.offset(4, 0);
-
-        type = TetrominoType.random();
+        type = this._getNewType();
+        if (type == null) {
+            this.stop();
+        }
         this._nextPiece = new Tetromino(type);
     },
 
@@ -422,11 +582,11 @@ var GameLayer = cc.Layer.extend({
 });
 
 var GameScene = cc.Scene.extend({
+    _layer: null,
     onEnter: function () {
         this._super();
-        var layer = new GameLayer();
-
-        this.addChild(layer);
+        this._layer = new GameLayer();
+        this.addChild(this._layer);
     }
 });
 
