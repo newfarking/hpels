@@ -444,7 +444,7 @@ var GameLayer = cc.Layer.extend({
         cc.eventManager.removeListeners(cc.EventListener.KEYBOARD);
 
         var coo = this.getCookie("hpels-0908");
-        if (this._success == true && coo != "") {
+        if (this._success == true && coo != "" && !this._replay) {
             var xhr = cc.loader.getXMLHttpRequest();
             xhr.open("POST", "/upload");
             xhr.setRequestHeader("Content-Type", "application/json");

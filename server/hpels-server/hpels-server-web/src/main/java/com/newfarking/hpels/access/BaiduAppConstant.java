@@ -10,5 +10,5 @@ public class BaiduAppConstant {
 
 //    public static final String REDIRECTURI = "http://180.76.152.79";
 
-    public static final String REDIRECTURI = "http://localhost:8080";
+    public static final String REDIRECTURI = "http://182.61.45.107:8080";
 }
