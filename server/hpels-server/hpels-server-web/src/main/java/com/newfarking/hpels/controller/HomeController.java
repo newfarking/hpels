@@ -57,7 +57,7 @@ public class HomeController {
                     "<div style=\"overflow:auto;margin-top:5px\"><div style=\"float:left;overflow:auto;\"> "
                             + index + ". "
                             + username + " <span style=\"color:red\">" + rank.useTime +
-                            "s</span> <a href=\"#\" onclick=\"gameScene._layer.startReplay('" + rank.id + "', true)\" style=\"font-size:6px;\">观看录像</a></div></div>");
+                            "s</span> <a href=\"#\" onclick=\"gameScene._layer.startReplay('" + rank.id + "', true)\" >观看录像</a></div></div>");
             index ++;
         }
         return stringBuilder.toString();
